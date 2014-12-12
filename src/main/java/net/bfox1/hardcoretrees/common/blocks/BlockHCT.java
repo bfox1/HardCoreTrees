@@ -1,6 +1,5 @@
 package net.bfox1.hardcoretrees.common.blocks;
 
-import net.bfox1.hardcoretrees.common.util.TabManagerHCT;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 
@@ -12,6 +11,6 @@ public class BlockHCT extends Block{
     public BlockHCT(Material material)
     {
         super(material);
-        this.setCreativeTab(TabManagerHCT.BLOCKS);
+        //this.setCreativeTab(TabManagerHCT.BLOCKS);
     }
 }
