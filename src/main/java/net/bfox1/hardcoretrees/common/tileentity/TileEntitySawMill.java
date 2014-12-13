@@ -1,11 +1,11 @@
 package net.bfox1.hardcoretrees.common.tileentity;
 
+import net.bfox1.hardcoretrees.common.blocks.SawMill;
 import net.bfox1.hardcoretrees.common.inventory.ContainerSawMill;
 import net.bfox1.hardcoretrees.common.items.ItemSawBlade;
 import net.bfox1.hardcoretrees.common.util.BladeType;
 import net.bfox1.hardcoretrees.common.util.SawMillRecipes;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFurnace;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -13,11 +13,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.*;
 import net.minecraft.item.*;
-import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.gui.IUpdatePlayerListBox;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
@@ -37,8 +35,8 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
     private ItemStack[] sawMillItemStack = new ItemStack[6];
     private int sawMillCutTime;
     private int cutTime;
+    private int currentCutTime;
     private int woodCutTime;
-    private int woodTotalTime;
     private String sawMillName;
     private static ItemStack cutSlot;
 
@@ -115,8 +113,8 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
 
         if (index == 1 && !flag)
         {
-            this.woodTotalTime = this.func_174904_a(stack);
-            this.woodCutTime = 0;
+            this.woodCutTime = this.func_174904_a(stack);
+            this.currentCutTime = 0;
             this.markDirty();
         }
     }
@@ -154,8 +152,8 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
         }
 
         this.sawMillCutTime = compound.getShort("BurnTime");
-        this.woodCutTime = compound.getShort("CookTime");
-        this.woodTotalTime = compound.getShort("CookTimeTotal");
+        this.currentCutTime = compound.getShort("CookTime");
+        this.woodCutTime = compound.getShort("CookTimeTotal");
         this.cutTime = getItemBurnTime(this.sawMillItemStack[1]);
 
         if (compound.hasKey("CustomName", 8))
@@ -168,8 +166,8 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
     {
         super.writeToNBT(compound);
         compound.setShort("BurnTime", (short)this.sawMillCutTime);
-        compound.setShort("CookTime", (short)this.woodCutTime);
-        compound.setShort("CookTimeTotal", (short)this.woodTotalTime);
+        compound.setShort("CookTime", (short)this.currentCutTime);
+        compound.setShort("CookTimeTotal", (short)this.woodCutTime);
         NBTTagList nbttaglist = new NBTTagList();
 
         for (int i = 0; i < this.sawMillItemStack.length; ++i)
@@ -221,15 +219,17 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
         {
             if (!this.isBurning() && (this.sawMillItemStack[2] == null || this.sawMillItemStack[1] == null))
             {
-                if (!this.isBurning() && this.woodCutTime > 0)
+                if (!this.isBurning() && this.currentCutTime > 0)
                 {
-                    this.woodCutTime = MathHelper.clamp_int(this.woodCutTime - 2, 0, this.woodTotalTime);
+                    this.currentCutTime = MathHelper.clamp_int(this.currentCutTime - 2, 0, this.woodCutTime);
                 }
             }
             else
             {
-                if (!this.isBurning() && this.canCut())
+                if (!this.isBurning() && this.canCut()  && isItemSawBlade(this.getStackInSlot(0)))
                 {
+                    System.out.println(isBurning() + " " + canCut());
+
                     this.cutTime = this.sawMillCutTime = getItemBurnTime(this.sawMillItemStack[2]);
 
                     if (this.isBurning())
@@ -248,28 +248,29 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
                     }
                 }
 
-                if (this.isBurning() && this.canCut())
+                if (this.isBurning() && this.canCut() && isItemSawBlade(this.getStackInSlot(0)))
                 {
-                    ++this.woodCutTime;
+                    ++this.currentCutTime;
 
-                    if (this.woodCutTime == this.woodTotalTime)
+                    if (this.currentCutTime == this.woodCutTime)
                     {
-                        this.woodCutTime = 0;
-                        this.woodTotalTime = this.func_174904_a(this.sawMillItemStack[1]);
+                        this.currentCutTime = 0;
+                        //this.woodCutTime = this.func_174904_a(this.sawMillItemStack[1]);
+                        this.woodCutTime = getCutTime(this.sawMillItemStack[0]);
                         this.cutItem();
                         flag1 = true;
                     }
                 }
                 else
                 {
-                    this.woodCutTime = 0;
+                    this.currentCutTime = 0;
                 }
             }
 
             if (flag != this.isBurning())
             {
                 flag1 = true;
-                BlockFurnace.setState(this.isBurning(), this.worldObj, this.pos);
+                SawMill.setState(this.isBurning(), this.worldObj, this.pos);
             }
         }
 
@@ -288,10 +289,13 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
     {
         if (this.sawMillItemStack[1] == null)
         {
+
             return false;
         }
         else
         {
+
+
             ItemStack itemstack = SawMillRecipes.instance().getCutResults(this.sawMillItemStack[1]);
             if (itemstack == null) return false;
             if (this.sawMillItemStack[4] == null) return true;
@@ -301,19 +305,38 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
         }
     }
 
+
+    public int calcAmount(ItemStack stack, ItemStack slotStack)
+    {
+        Item item = slotStack.getItem();
+        for(BladeType type: BladeType.values())
+        {
+            if (item instanceof ItemSawBlade)
+            {
+
+                if(item == type.getSawItem())
+                {
+                   return stack.stackSize = ((ItemSawBlade) item).getType().getItemAmount();
+                }
+            }
+
+        }
+        return stack.stackSize;
+    }
+
     public void cutItem()
     {
         if (this.canCut())
         {
             ItemStack itemstack = SawMillRecipes.instance().getCutResults(this.sawMillItemStack[1]);
-            ItemStack itemstack1 = SawMillRecipes.instance().getDustResults(this.sawMillItemStack[1]);
-
+            ItemStack itemstack1 = SawMillRecipes.instance().getDustResults(itemstack);
+            itemstack.stackSize = calcAmount(itemstack, this.sawMillItemStack[0]);
             if (this.sawMillItemStack[4] == null)
             {
                 this.sawMillItemStack[4] = itemstack.copy();
                 this.sawMillItemStack[5] = itemstack1.copy();
             }
-            else if (this.sawMillItemStack[4].getItem() == itemstack.getItem() && this.sawMillItemStack[5].getItem() == itemstack1.getItem())
+            else if (this.sawMillItemStack[4].getItem() == itemstack.getItem())
             {
                 this.sawMillItemStack[4].stackSize += itemstack.stackSize; // Forge BugFix: Results may have multiple items
                 this.sawMillItemStack[5].stackSize += itemstack1.stackSize;
@@ -371,10 +394,12 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
         }
     }
 
-    public static int getCutTime(BladeType material)
+    public static int getCutTime(ItemStack stack)
     {
+        Item item = stack.getItem();
+        int speed = ((ItemSawBlade)item).getType().getCutSpeed();
 
-        return material.getCutSpeed();
+        return speed;
     }
 
     public static boolean isItemFuel(ItemStack p_145954_0_)
@@ -442,6 +467,7 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
             return isItemWood(stack);
         }
         return false;
+    //    return index == 2 ? false : (index == 1 ? isItemFuel(stack) : true);
     }
     @Override
     public int[] getSlotsForFace(EnumFacing side)
@@ -489,9 +515,9 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
             case 1:
                 return this.cutTime;
             case 2:
-                return this.woodCutTime;
+                return this.currentCutTime;
             case 3:
-                return this.woodTotalTime;
+                return this.woodCutTime;
             default:
                 return 0;
         }
@@ -508,10 +534,10 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
                 this.cutTime = value;
                 break;
             case 2:
-                this.woodCutTime = value;
+                this.currentCutTime = value;
                 break;
             case 3:
-                this.woodTotalTime = value;
+                this.woodCutTime = value;
         }
     }
     @Override

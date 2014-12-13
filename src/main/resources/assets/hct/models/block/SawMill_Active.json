@@ -1,0 +1,9 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "hct:blocks/sawmill_top_on",
+        "side": "hct:blocks/sawmill_side",
+		"front": "hct:blocks/sawmill_side",
+		"bottom": "hct:blocks/sawmill_side"
+    }
+}

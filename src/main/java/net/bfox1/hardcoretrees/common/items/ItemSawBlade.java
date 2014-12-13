@@ -33,6 +33,7 @@ public class ItemSawBlade extends Item {
         this.type = type;
         this.setCreativeTab(CreativeTabs.tabMaterials);
          this.setUnlocalizedName("hct:" + type.getUnlocalizedName() + "_blade");
+        this.setMaxStackSize(1);
     }
 
     public int getDurability()

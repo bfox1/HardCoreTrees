@@ -47,6 +47,7 @@ public class SawMill extends BlockContainer {
     public SawMill(Material material, boolean isCutting) {
         super(material);
         this.setUnlocalizedName("SawMill");
+        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         this.setCreativeTab(CreativeTabs.tabBlock);
         this.isCutting = isCutting;
     }
@@ -132,10 +133,6 @@ public class SawMill extends BlockContainer {
     {
         if (!worldIn.isRemote)
         {
-            return true;
-        }
-        else
-        {
             TileEntity tileentity = worldIn.getTileEntity(new BlockPos(pos.getX(), pos.getY(), pos.getZ()));
 
                     System.out.println(pos.getX() + " " + pos.getY() + " " + pos.getZ() + tileentity);
@@ -143,12 +140,10 @@ public class SawMill extends BlockContainer {
                     blockPosY = pos.getY();
                     blockPosZ = pos.getZ();
 
-                    //playerIn.openGui((TileEntitySawMill)tileentity, 1, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
+                 //   playerIn.openGui((TileEntitySawMill)tileentity, 1, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
                     FMLNetworkHandler.openGui(playerIn, HardCoreTrees.instance, 1, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
-
-
-            return true;
         }
+        return true;
     }
 
     public static int getBlockPosX()
@@ -174,6 +169,7 @@ public class SawMill extends BlockContainer {
 
         if (active)
         {
+            System.out.println();
             worldIn.setBlockState(pos, initBlocks.sawMillActive.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
             worldIn.setBlockState(pos, initBlocks.sawMillActive.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
         }
@@ -195,7 +191,6 @@ public class SawMill extends BlockContainer {
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta)
     {
-        System.out.println("CREATING TILEENTITY");
         return new TileEntitySawMill();
     }
 

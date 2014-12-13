@@ -22,6 +22,8 @@ public enum BladeType
     private ItemSawBlade item;
     private BladeType type;
     private int cutSpeed;
+    private int itemAmount;
+
 
 
 
@@ -30,6 +32,7 @@ public enum BladeType
         this.metaData = metaData;
         this.unlocalizedName = name;
         this.material = material;
+        this.itemAmount = material.getItemAmount();
         this.cutSpeed = material.getCutSpeed();
     }
 
@@ -45,6 +48,10 @@ public enum BladeType
     public Item getSawItem()
     {
         return item;
+    }
+    public int getItemAmount()
+    {
+        return itemAmount;
     }
 
     public String getUnlocalizedName()
@@ -75,13 +82,15 @@ public enum BladeType
 
     public static boolean isValid(ItemStack stack)
     {
-        for(BladeType type : BladeType.values()) {
-            ItemStack stack1 = new ItemStack(type.getSawItem());
-            if(stack.equals(stack1))
-            {
+        if(stack != null) {
+            Item item = stack.getItem();
+            // for(BladeType type : BladeType.values()) {
+            // ItemStack stack1 = new ItemStack(type.getSawItem());
+            if (item instanceof ItemSawBlade) {
                 return true;
             }
         }
+       // }
         return false;
     }
 }

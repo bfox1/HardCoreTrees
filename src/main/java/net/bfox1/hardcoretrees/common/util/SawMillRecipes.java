@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import net.bfox1.hardcoretrees.common.init.initItems;
 import net.bfox1.hardcoretrees.common.items.ItemSawBlade;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -29,8 +30,14 @@ public class SawMillRecipes {
 
     private SawMillRecipes()
     {
-        this.addSawMillBlockRecipe(Blocks.log, new ItemStack(Items.coal, 1, 10), new ItemStack(initItems.sawDust, 3));
-        this.addSawMillBlockRecipe(Blocks.log2, new ItemStack(Items.coal, 1, 10), new ItemStack(initItems.sawDust, 3));
+        for(BlockPlanks.EnumType type: BlockPlanks.EnumType.values())
+        {
+            if(type.getMetadata() <4) {
+                this.addSawMillBlockRecipe(Blocks.log, new ItemStack(Blocks.planks, 10, type.getMetadata()), new ItemStack(initItems.sawDust, 3));
+            } else {
+                this.addSawMillBlockRecipe(Blocks.log2, new ItemStack(Blocks.planks, 10, type.getMetadata()), new ItemStack(initItems.sawDust, 3));
+            }
+        }
         this.addSawMillBlockRecipe(Blocks.planks, new ItemStack(Items.stick, 8), new ItemStack(initItems.sawDust, 2));
     }
 

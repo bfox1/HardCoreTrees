@@ -12,12 +12,13 @@ public class SawBladeMaterial {
     private int durability;
 
     private int speed;
+    private int itemAmount;
 
 
-    public static final SawBladeMaterial woodBlade = new SawBladeMaterial("wood").setDurability(10).setCutSpeed(5);
-    public static final SawBladeMaterial stoneBlade = new SawBladeMaterial("stone").setDurability(30).setCutSpeed(10);
-    public static final SawBladeMaterial ironBlade = new SawBladeMaterial("iron").setDurability(90).setCutSpeed(30);
-    public static final SawBladeMaterial diamondBlade = new SawBladeMaterial("diamond").setDurability(250).setCutSpeed(100);
+    public static final SawBladeMaterial woodBlade = new SawBladeMaterial("wood").setDurability(10).setCutSpeed(200).setItemOutput(3);
+    public static final SawBladeMaterial stoneBlade = new SawBladeMaterial("stone").setDurability(30).setCutSpeed(180).setItemOutput(5);
+    public static final SawBladeMaterial ironBlade = new SawBladeMaterial("iron").setDurability(90).setCutSpeed(150).setItemOutput(7);
+    public static final SawBladeMaterial diamondBlade = new SawBladeMaterial("diamond").setDurability(250).setCutSpeed(100).setItemOutput(10);
 
     public static final SawBladeMaterial stoneTipWood = new SawBladeMaterial("wood", "stone").setDurability(25);
 
@@ -48,6 +49,10 @@ public class SawBladeMaterial {
         return durability;
     }
     public int getCutSpeed() {return speed;}
+    public int getItemAmount()
+    {
+        return this.itemAmount;
+    }
 
     private SawBladeMaterial setDurability(int durability)
     {
@@ -58,6 +63,12 @@ public class SawBladeMaterial {
     private SawBladeMaterial setCutSpeed(int speed)
     {
         this.speed = speed;
+        return this;
+    }
+
+    private SawBladeMaterial setItemOutput(int amount)
+    {
+        this.itemAmount = amount;
         return this;
     }
 

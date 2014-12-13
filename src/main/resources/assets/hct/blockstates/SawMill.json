@@ -1,0 +1,8 @@
+ {
+    "variants": {
+        "facing=north": { "model": "hct:SawMill" },
+        "facing=south": { "model": "hct:SawMill", "y": 180 },
+        "facing=west":  { "model": "hct:SawMill", "y": 270 },
+        "facing=east":  { "model": "hct:SawMill", "y": 90 }
+    }
+}

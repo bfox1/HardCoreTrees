@@ -1,5 +1,6 @@
 package net.bfox1.hardcoretrees.common.util;
 
+import net.minecraft.block.BlockPlanks;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -19,7 +20,10 @@ public class RecipeRemoval {
     public static void init()
     {
         RemoveRecipeByOutput(new ItemStack(Items.stick));
-        RemoveRecipeByOutput(new ItemStack(Blocks.planks));
+        for(BlockPlanks.EnumType type : BlockPlanks.EnumType.values())
+        {
+            RemoveRecipeByOutput(new ItemStack(Blocks.planks, 1, type.getMetadata()));
+        }
     }
 
     private static void RemoveRecipeByOutput(ItemStack resultItem) {
@@ -30,8 +34,13 @@ public class RecipeRemoval {
             IRecipe tmpRecipe = (IRecipe) recipes.get(scan);
             recipeResult = tmpRecipe.getRecipeOutput();
             if (recipeResult != null) {
-                if (recipeResult.getItem() == resultItem.getItem() && recipeResult.getItemDamage() == resultItem.getItemDamage() && recipeResult.stackSize == recipeResult.stackSize) {
-                    //LogHelper.info("SAO Removed Recipe: " + recipes.get(scan) + " ===> " + recipeResult);
+                if (recipeResult.getItem() == resultItem.getItem() && recipeResult.getItemDamage() == resultItem.getItemDamage()) {
+                    System.out.println(("SAO Removed Recipe: "+ resultItem + " " + recipes.get(scan) + " ===> " + recipeResult));
+                    recipes.remove(scan);
+                    scan--;
+                }
+                if(recipeResult.getMetadata() == resultItem.getMetadata() && recipeResult.getItem() == resultItem.getItem())
+                {
                     recipes.remove(scan);
                     scan--;
                 }

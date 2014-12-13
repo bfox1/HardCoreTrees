@@ -5,6 +5,7 @@ import net.bfox1.hardcoretrees.common.blocks.SawMill;
 import net.bfox1.hardcoretrees.common.helper.ModelHelper;
 import net.bfox1.hardcoretrees.common.init.initBlocks;
 import net.bfox1.hardcoretrees.common.init.initItems;
+import net.bfox1.hardcoretrees.common.inventory.ContainerSawMill;
 import net.bfox1.hardcoretrees.common.reference.Reference;
 import net.bfox1.hardcoretrees.common.tileentity.TileEntitySawMill;
 import net.minecraft.client.Minecraft;

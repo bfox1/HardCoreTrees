@@ -1,5 +1,7 @@
 package net.bfox1.hardcoretrees.common.inventory;
 
+import net.bfox1.hardcoretrees.common.tileentity.TileEntitySawMill;
+import net.bfox1.hardcoretrees.common.util.SawMillRecipes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
@@ -21,9 +23,11 @@ public class ContainerSawMill extends Container {
     public ContainerSawMill(InventoryPlayer p_i45794_1_, IInventory sawMillInventory)
     {
         this.tileSawMill = sawMillInventory;
-        this.addSlotToContainer(new Slot(sawMillInventory, 0, 56, 17));
-        this.addSlotToContainer(new SlotFurnaceFuel(sawMillInventory, 1, 56, 53));
-        this.addSlotToContainer(new SlotFurnaceOutput(p_i45794_1_.player, sawMillInventory, 2, 116, 35));
+        this.addSlotToContainer(new SlotSawMillBlade(sawMillInventory, 0, 79, 7)); //sawBlade
+        this.addSlotToContainer(new Slot(sawMillInventory, 1, 79, 55)); //Input
+        this.addSlotToContainer(new SlotFurnaceFuel(sawMillInventory, 2, 8, 56)); //FUEL
+        this.addSlotToContainer(new SlotFurnaceOutput(p_i45794_1_.player,sawMillInventory,  3, 135, 42));//output
+        this.addSlotToContainer(new SlotFurnaceOutput(p_i45794_1_.player,sawMillInventory,  4, 135, 59));//output
         int i;
 
         for (i = 0; i < 3; ++i)
@@ -104,25 +108,25 @@ public class ContainerSawMill extends Container {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index == 2)
+            if (index == 3 || index == 4)
             {
-                if (!this.mergeItemStack(itemstack1, 3, 39, true))
+                if (!this.mergeItemStack(itemstack1, 6, 39, true))
                 {
                     return null;
                 }
 
                 slot.onSlotChange(itemstack1, itemstack);
             }
-            else if (index != 1 && index != 0)
+            else if (index != 1 && index != 0 && index != 2)
             {
-                if (FurnaceRecipes.instance().getSmeltingResult(itemstack1) != null)
+                if (SawMillRecipes.instance().getCutResults(itemstack1) != null)
                 {
                     if (!this.mergeItemStack(itemstack1, 0, 1, false))
                     {
                         return null;
                     }
                 }
-                else if (TileEntityFurnace.isItemFuel(itemstack1))
+                else if (TileEntitySawMill.isItemFuel(itemstack1))
                 {
                     if (!this.mergeItemStack(itemstack1, 1, 2, false))
                     {

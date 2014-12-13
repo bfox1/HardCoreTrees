@@ -1,5 +1,7 @@
 package net.bfox1.hardcoretrees.common.proxy;
 
+import net.bfox1.hardcoretrees.client.GuiSawMill;
+import net.bfox1.hardcoretrees.common.blocks.SawMill;
 import net.bfox1.hardcoretrees.common.inventory.ContainerSawMill;
 import net.bfox1.hardcoretrees.common.tileentity.TileEntitySawMill;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,6 +25,9 @@ public abstract class CommonProxy implements HctProxy, IGuiHandler {
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        x = SawMill.getBlockPosX();
+        y = SawMill.getBlockPosY();
+        z = SawMill.getBlockPosZ();
         TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
         if(te != null & te instanceof TileEntitySawMill)
         {
