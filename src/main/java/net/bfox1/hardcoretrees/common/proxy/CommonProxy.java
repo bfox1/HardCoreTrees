@@ -25,9 +25,6 @@ public abstract class CommonProxy implements HctProxy, IGuiHandler {
 
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        x = SawMill.getBlockPosX();
-        y = SawMill.getBlockPosY();
-        z = SawMill.getBlockPosZ();
         TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
         if(te != null & te instanceof TileEntitySawMill)
         {

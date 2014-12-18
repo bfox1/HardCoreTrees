@@ -27,7 +27,7 @@ public enum BladeType
 
 
 
-    private BladeType(int metaData, String name, SawBladeMaterial material)
+    private   BladeType(int metaData, String name, SawBladeMaterial material)
     {
         this.metaData = metaData;
         this.unlocalizedName = name;

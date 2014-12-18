@@ -24,9 +24,12 @@ import org.lwjgl.opengl.GL11;
 public class GuiSawMill extends GuiContainer {
 
     private static final ResourceLocation guiSawMill = new ResourceLocation(Reference.MODID, "/textures/gui/container/saw_mill.png");
-    private IInventory sm;
+    private TileEntitySawMill sm;
 
-    public GuiSawMill(InventoryPlayer player, IInventory sawMill) {
+    private boolean passed = false;
+    private boolean passedOther = false;
+
+    public GuiSawMill(InventoryPlayer player, TileEntitySawMill sawMill) {
         super(new ContainerSawMill(player, sawMill));
         this.sm = sawMill;
 
@@ -39,13 +42,22 @@ public class GuiSawMill extends GuiContainer {
     {
         //String s = this.sm.hasCustomName() ? this.sm.getName() : I18n.format(this.sm.getName());
         String s = I18n.format("SawMill");
+        if(!this.passed)
+        {
+            System.out.println("PASSED");
+            this.passed = true;
+        }
         this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
         this.fontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 4210752); // Draws the name roughly in the same spot as in the furnace - Skymmer
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_) {
-
+        if(!this.passedOther)
+        {
+            System.out.println("PASSEDAGAIN");
+            this.passedOther = true;
+        }
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         Minecraft.getMinecraft().getTextureManager().bindTexture(guiSawMill);
         int k = (this.width - this.xSize) / 2;

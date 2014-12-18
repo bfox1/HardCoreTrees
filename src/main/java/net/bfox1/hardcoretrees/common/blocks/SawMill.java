@@ -2,16 +2,21 @@ package net.bfox1.hardcoretrees.common.blocks;
 
 import net.bfox1.hardcoretrees.common.HardCoreTrees;
 import net.bfox1.hardcoretrees.common.init.initBlocks;
+import net.bfox1.hardcoretrees.common.init.initItems;
 import net.bfox1.hardcoretrees.common.tileentity.TileEntitySawMill;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.BlockLog;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
@@ -39,10 +44,8 @@ public class SawMill extends BlockContainer {
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     private final boolean isCutting;
     private static boolean keepInventory;
-
-    private static int blockPosX;
-    private static int blockPosY;
-    private static int blockPosZ;
+    private static EntityPlayer player;
+    private static boolean wasActive = false;
 
     public SawMill(Material material, boolean isCutting) {
         super(material);
@@ -131,33 +134,27 @@ public class SawMill extends BlockContainer {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        if (!worldIn.isRemote)
-        {
+        if (!worldIn.isRemote) {
             TileEntity tileentity = worldIn.getTileEntity(new BlockPos(pos.getX(), pos.getY(), pos.getZ()));
+            playerIn.openGui(HardCoreTrees.instance, 1, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            // FMLNetworkHandler.openGui(playerIn, HardCoreTrees.instance, 1, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
-                    System.out.println(pos.getX() + " " + pos.getY() + " " + pos.getZ() + tileentity);
-                    blockPosX = pos.getX();
-                    blockPosY = pos.getY();
-                    blockPosZ = pos.getZ();
-
-                 //   playerIn.openGui((TileEntitySawMill)tileentity, 1, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
-                    FMLNetworkHandler.openGui(playerIn, HardCoreTrees.instance, 1, worldIn, (int)playerIn.posX, (int)playerIn.posY, (int)playerIn.posZ);
         }
+      /* if(worldIn.isRemote)
+        {
+            TileEntitySawMill entity = new TileEntitySawMill();
+            entity.setSlotStack(playerIn);
+            this.wasActive = true;
+            setPlayerVar(playerIn);
+            System.out.println("MADE IT");
+
+        }*/
         return true;
     }
 
-    public static int getBlockPosX()
+    private void setPlayerVar(EntityPlayer player)
     {
-        return blockPosX;
-    }
-
-    public static int getBlockPosY()
-    {
-        return blockPosY;
-    }
-    public static int getBlockPosZ()
-    {
-        return blockPosZ;
+        this.player = player;
     }
 
 

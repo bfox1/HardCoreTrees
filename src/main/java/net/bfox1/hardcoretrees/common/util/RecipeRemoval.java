@@ -15,6 +15,22 @@ import java.util.ArrayList;
  */
 public class RecipeRemoval {
 
+    private static  Item[] removeItemList =
+    {
+        Items.wooden_axe,
+            Items.wooden_hoe,
+            Items.wooden_pickaxe,
+            Items.wooden_shovel,
+            Items.wooden_sword,
+            Items.stone_axe,
+            Items.stone_hoe,
+            Items.stone_pickaxe,
+            Items.stone_shovel,
+            Items.stone_sword,
+            Items.iron_sword
+            
+    };
+
 
 
     public static void init()
@@ -24,6 +40,13 @@ public class RecipeRemoval {
         {
             RemoveRecipeByOutput(new ItemStack(Blocks.planks, 1, type.getMetadata()));
         }
+
+        for(Item item : removeItemList)
+        {
+            RemoveRecipeByOutput(new ItemStack(item));
+        }
+
+
     }
 
     private static void RemoveRecipeByOutput(ItemStack resultItem) {

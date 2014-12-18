@@ -15,12 +15,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * Created by bfox1 on 12/11/2014.
  */
 public class ContainerSawMill extends Container {
-    private final IInventory tileSawMill;
+    private final TileEntitySawMill tileSawMill;
     private int woodCutTime;
     private int woodTotalTime;
     private int sawMillCutTime;
     private int cutTime;
-    public ContainerSawMill(InventoryPlayer p_i45794_1_, IInventory sawMillInventory)
+    public ContainerSawMill(InventoryPlayer p_i45794_1_, TileEntitySawMill sawMillInventory)
     {
         this.tileSawMill = sawMillInventory;
         this.addSlotToContainer(new SlotSawMillBlade(sawMillInventory, 0, 79, 7)); //sawBlade

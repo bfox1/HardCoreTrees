@@ -1,12 +1,14 @@
 package net.bfox1.hardcoretrees.common.tileentity;
 
 import net.bfox1.hardcoretrees.common.blocks.SawMill;
+import net.bfox1.hardcoretrees.common.init.initItems;
 import net.bfox1.hardcoretrees.common.inventory.ContainerSawMill;
 import net.bfox1.hardcoretrees.common.items.ItemSawBlade;
 import net.bfox1.hardcoretrees.common.util.BladeType;
 import net.bfox1.hardcoretrees.common.util.SawMillRecipes;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -19,8 +21,10 @@ import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.Sys;
 
 /**
  * Created by bfox1 on 12/11/2014.
@@ -39,11 +43,14 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
     private int woodCutTime;
     private String sawMillName;
     private static ItemStack cutSlot;
+    private boolean visual = false;
 
 
-    public TileEntitySawMill()
+    public TileEntitySawMill( )
     {
         super();
+
+
     }
 
     @Override
@@ -154,6 +161,7 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
         this.sawMillCutTime = compound.getShort("BurnTime");
         this.currentCutTime = compound.getShort("CookTime");
         this.woodCutTime = compound.getShort("CookTimeTotal");
+        this.visual = compound.getBoolean("visual");
         this.cutTime = getItemBurnTime(this.sawMillItemStack[1]);
 
         if (compound.hasKey("CustomName", 8))
@@ -165,9 +173,10 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
     public void writeToNBT(NBTTagCompound compound)
     {
         super.writeToNBT(compound);
-        compound.setShort("BurnTime", (short)this.sawMillCutTime);
+        compound.setShort("BurnTime", (short) this.sawMillCutTime);
         compound.setShort("CookTime", (short)this.currentCutTime);
         compound.setShort("CookTimeTotal", (short)this.woodCutTime);
+        compound.setBoolean("visual", this.visual);
         NBTTagList nbttaglist = new NBTTagList();
 
         for (int i = 0; i < this.sawMillItemStack.length; ++i)
@@ -217,6 +226,8 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
 
         if (!this.worldObj.isRemote)
         {
+            activateVisual();
+
             if (!this.isBurning() && (this.sawMillItemStack[2] == null || this.sawMillItemStack[1] == null))
             {
                 if (!this.isBurning() && this.currentCutTime > 0)
@@ -231,6 +242,8 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
                     System.out.println(isBurning() + " " + canCut());
 
                     this.cutTime = this.sawMillCutTime = getItemBurnTime(this.sawMillItemStack[2]);
+
+
 
                     if (this.isBurning())
                     {
@@ -258,6 +271,7 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
                         //this.woodCutTime = this.func_174904_a(this.sawMillItemStack[1]);
                         this.woodCutTime = getCutTime(this.sawMillItemStack[0]);
                         this.cutItem();
+                        this.damageBlade(this.sawMillItemStack[0]);
                         flag1 = true;
                     }
                 }
@@ -284,6 +298,15 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
     {
         return 200;
     }
+
+    public void damageBlade(ItemStack stack)
+    {
+        if(this.sawMillItemStack[0].getItemDamage() <= 0 )
+        {
+            this.sawMillItemStack[0] = null;
+        }
+    }
+
 
     private boolean canCut()
     {
@@ -329,19 +352,26 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
         if (this.canCut())
         {
             ItemStack itemstack = SawMillRecipes.instance().getCutResults(this.sawMillItemStack[1]);
-            ItemStack itemstack1 = SawMillRecipes.instance().getDustResults(itemstack);
+            ItemStack itemStack1;
             itemstack.stackSize = calcAmount(itemstack, this.sawMillItemStack[0]);
             if (this.sawMillItemStack[4] == null)
             {
                 this.sawMillItemStack[4] = itemstack.copy();
-                this.sawMillItemStack[5] = itemstack1.copy();
+                itemStack1 = SawMillRecipes.instance().getDustResults(this.sawMillItemStack[4]);
+                this.sawMillItemStack[3] = itemStack1.copy();
             }
             else if (this.sawMillItemStack[4].getItem() == itemstack.getItem())
             {
                 this.sawMillItemStack[4].stackSize += itemstack.stackSize; // Forge BugFix: Results may have multiple items
-                this.sawMillItemStack[5].stackSize += itemstack1.stackSize;
+              //  this.sawMillItemStack[5].stackSize += itemstack1.stackSize;
+                itemStack1 = SawMillRecipes.instance().getDustResults(this.sawMillItemStack[4]);
+                this.sawMillItemStack[3].stackSize += itemStack1.stackSize;
             }
 
+            if(this.sawMillItemStack[1].stackSize == 1)
+            {
+                this.setVisual(this.sawMillItemStack[1], true);
+            }
 
             --this.sawMillItemStack[1].stackSize;
 
@@ -351,6 +381,88 @@ public class TileEntitySawMill extends TileEntityLockable implements IUpdatePlay
             }
         }
     }
+
+    public void setSlotStack(EntityPlayer player)
+    {
+
+        if(player.getHeldItem() != null && Block.getBlockFromItem(player.getHeldItem().getItem()) instanceof Block ) {
+            ItemStack stack = player.getHeldItem();
+            if(this.sawMillItemStack[1] == null) {
+                this.sawMillItemStack[1] = stack;
+                stack.stackSize = 0;
+
+            }
+            else
+            if(this.sawMillItemStack[1] != null && this.sawMillItemStack[1] == stack)
+            {
+                if(this.sawMillItemStack[1].stackSize + stack.stackSize > 64 && stack.stackSize != 64)
+                {
+                    int remainder = this.sawMillItemStack[1].stackSize - stack.stackSize;
+                    this.sawMillItemStack[1].stackSize += remainder;
+                    player.getCurrentEquippedItem().stackSize -= remainder;
+                }
+                this.sawMillItemStack[1].stackSize += stack.stackSize;
+                player.getHeldItem().setItem(null);
+            }
+            else
+            if(this.sawMillItemStack[1] != null && this.sawMillItemStack[1] != stack)
+            {
+
+
+            }
+            if(player.getHeldItem().stackSize <= 0 )
+            {
+                for(int i = 0; i < player.inventory.mainInventory.length; i++)
+                {
+                    if(player.inventory.getStackInSlot(i).stackSize <=0)
+                    {
+                        player.inventory.setInventorySlotContents(i, null);
+                    }
+                }
+            }
+
+        }
+    }
+
+
+
+
+
+    public void activateVisual()
+    {
+        if(this.visual == false) {
+            if (this.sawMillItemStack[1] != null) {
+                if (this.visual == false) {
+                    setVisual(this.sawMillItemStack[1], false);
+                    this.visual = true;
+                }
+            }
+        } else if(this.sawMillItemStack[1] == null)
+        {
+            this.visual = false;
+        }
+    }
+
+    public void setVisual(ItemStack stack, boolean flag)
+    {
+
+        EntityItem item = new EntityItem(this.worldObj, this.getPos().getX() + 0.5, this.getPos().getY() + 1, this.getPos().getZ() + 0.5, stack);
+
+        item.setInfinitePickupDelay();
+        item.setNoDespawn();
+        item.cannotPickup();
+        item.hoverStart = 0F;
+        item.motionX = 0;
+        item.motionY = 0;
+        item.motionZ = 0;
+        this.worldObj.spawnEntityInWorld(item);
+        if(flag == true)
+        {
+            this.worldObj.removeEntity(item);
+        }
+    }
+
+
 
     public static int getItemBurnTime(ItemStack fuelItem)
     {

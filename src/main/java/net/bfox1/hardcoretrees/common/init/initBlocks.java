@@ -8,6 +8,11 @@ import net.bfox1.hardcoretrees.common.reference.Reference;
 import net.bfox1.hardcoretrees.common.tileentity.TileEntitySawMill;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
@@ -23,14 +28,15 @@ public class initBlocks {
     public static Block sawMill = new SawMill(Material.wood, false);
 
 
+
     public static void registerInit()
     {
        // GameRegistry.registerBlock(steelBlock, Reference.MODID + steelBlock.getUnlocalizedName().substring(5));
-        GameRegistry.registerBlock(sawMill, "SawMill");
+        GameRegistry.registerBlock(sawMill, sawMill.getUnlocalizedName().substring(5));
         GameRegistry.registerBlock(sawMillActive, "SawMill_Active");
         GameRegistry.registerTileEntity(TileEntitySawMill.class, "SawMill");
-        ModelHelper.registerBlock(sawMill, "hct:Saw_Mill");
-        ModelHelper.registerBlock(sawMillActive, "hct:Saw_Mill_Active");
+        ModelHelper.registerBlock(sawMill, "hct:SawMill");
+        ModelHelper.registerBlock(sawMillActive, "hct:SawMill_Active");
     }
 }
 

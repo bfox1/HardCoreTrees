@@ -21,7 +21,7 @@ public class Recipe {
         {
             plank = new ItemStack(Blocks.planks, 1, type.getMetadata());
             GameRegistry.addRecipe(new ItemStack(Items.stick, 2),"x","x", 'x', plank );
-            if(type.getMetadata() < 4)
+            if(type.getMetadata() <= 3)
             {
                 GameRegistry.addShapelessRecipe(new ItemStack(Blocks.planks, 1, type.getMetadata()), new ItemStack(Blocks.log, 1, type.getMetadata()));
             }else{

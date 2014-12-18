@@ -21,7 +21,7 @@ public class ItemSawBlade extends Item {
 
     private static SawBladeMaterial material;
 
-    private static int durability;
+    private int durability;
 
     private BladeType type;
 
@@ -31,6 +31,8 @@ public class ItemSawBlade extends Item {
     public ItemSawBlade(BladeType type)
     {
         this.type = type;
+        this.durability = type.getMaterial().getDurability();
+        this.setMaxDamage(this.durability);
         this.setCreativeTab(CreativeTabs.tabMaterials);
          this.setUnlocalizedName("hct:" + type.getUnlocalizedName() + "_blade");
         this.setMaxStackSize(1);
@@ -50,6 +52,8 @@ public class ItemSawBlade extends Item {
     {
         this.durability = amount;
     }
+
+
 
     public String getMaterial()
     {

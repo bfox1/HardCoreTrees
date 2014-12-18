@@ -39,12 +39,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 
-        x = SawMill.getBlockPosX();
-        y = SawMill.getBlockPosY();
-        z = SawMill.getBlockPosZ();
-        System.out.println(x + " " + y + " " + z);
         TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-        System.out.println("First - CLIENTGUI" + ID + te);
         switch (ID) {
             case 1:
                 if (te != null && te instanceof TileEntitySawMill) {
